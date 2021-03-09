@@ -115,6 +115,28 @@ def recipes():
     print("responding to recipe-data request")
     return (recipe)
 
+@app.route("/search_cocktail/<cocktail_name>")
+def singleSearch(cocktail_name):
+    search_term = cocktail_name.replace("%20", " ")
+
+    mycursor.execute("SELECT * FROM cocktail;")
+    results = mycursor.fetchall()
+    cocktail_list = [result[0] for result in results]
+    # search_list = jsonify(cocktail_list)
+    # return jsonify(cocktail_list)
+
+    # search_dict = json.loads(search_list)
+    if search_term in cocktail_list:
+    # if search_term == cocktail_list:
+    # if Object.values(cocktail_list).includes(search_term):
+    # if search_term == search_list:
+        mycursor.execute(f"SELECT * FROM measure WHERE cocktail = '{search_term}'")
+        results = mycursor.fetchall()
+        result_dicts = [ {"cocktail": result[2], "ingredient": result[0], "measure": result[1], "unit": result[3]} for result in results]
+        return jsonify(result_dicts)
+
+    return jsonify({"error": f"{cocktail_name} not found in dataset."}), 404
+
 if __name__ == "__main__":
     app.run(debug=True)
 
